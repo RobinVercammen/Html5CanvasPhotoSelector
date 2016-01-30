@@ -22,17 +22,18 @@
         }
     });
 
-    $("#firstPictureCanvas").on('mousemove', function hoverHandler(e) {
-        if (!firstPoint && !secondPoint) {
-            firstPoint = this.relMouseCoords(e);
-        } else if (firstPoint && !secondPoint) {
-            secondPoint = this.relMouseCoords(e);
-            var newrect = new Rectangle(firstPoint, secondPoint)
-            memoryCanvas.rectangles.push(newrect);
-            firstPoint = null;
-            secondPoint = null;
-        } else {
+    $("#firstPictureCanvas").on('contextmenu', function contextHandler(e) {
+        e.preventDefault();
+        memoryCanvas.activeRectangle = null;
+        firstPoint = null;
+        secondPoint = null;
+    });
 
+
+    $("#firstPictureCanvas").on('mousemove', function hoverHandler(e) {
+        if (firstPoint && !secondPoint) {
+            var newrect = new Rectangle(firstPoint, this.relMouseCoords(e))
+            memoryCanvas.activeRectangle = newrect;
         }
     });
 
@@ -46,6 +47,7 @@
 function MemoryCanvas(canvashelper) {
     this.canvasHelper = canvashelper;
     this.rectangles = [];
+    this.activeRectangle = null;
 
     this.draw = function draw() {
         this.canvasHelper.clearCanvas();
@@ -53,6 +55,11 @@ function MemoryCanvas(canvashelper) {
         for (var i = 0; i < this.rectangles.length; i++) {
             this.canvasHelper.drawRectangle(this.rectangles[i]);
         }
+
+        if (this.activeRectangle) {
+            this.canvasHelper.drawRectangle(this.activeRectangle);
+        }
+
 
         this.start();
     }
